@@ -65,9 +65,9 @@ async def on_message(message):
     await bot.process_commands(message)
 
 # basic currency converter
-@bot.command(name = 'cc',
-    brief = 'Converts amount from orig to new currency. Use $help cc for more info.',
-    description = ('Usage: $cc <amount> <orig_currency> <new_currency>'
+@bot.command(name='cc',
+    brief='Converts amount from orig to new currency. Use $help cc for more info.',
+    description=('Usage: $cc <amount> <orig_currency> <new_currency>'
         '\nThis bot currently supports the following currencies:'
         '\n\'usd\', \'eur\''
         '\nExample: $cc 50 usd eur'
@@ -84,5 +84,28 @@ async def cc(ctx, amt:float, orig_c, new_c):
         value = round(amt * ratios_dict['eur_to_usd'], 2)
         response = f'{amt}€ equals ${value}'
         await ctx.send(response)
+
+# bot say - Admin only
+@bot.command(name='say',
+    brief='Use the bot to say something. Admins only.')
+@commands.has_role('Admin')
+async def say(ctx, *args):
+    guild = ctx.guild
+    message = ' '.join(args)
+
+    await ctx.message.delete()
+    await ctx.send(message)
+
+# bot announcement - Admin only
+@bot.command(name='announce',
+    brief='Use the bot to make an announcement. Admins only.')
+@commands.has_role('Admin')
+async def announce(ctx, *args):
+    guild = ctx.guild
+    message = ' '.join(args)
+    announcement_channel = discord.utils.get(guild.channels, name='announcements')
+
+    await ctx.message.delete()
+    await announcement_channel.send(message)
 
 bot.run(TOKEN)
