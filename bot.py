@@ -72,7 +72,7 @@ async def on_command_error(ctx, error):
     if isinstance(error, commands.errors.CheckFailure):
         return await ctx.send('You do not have the required role to use this command.')
     if isinstance(error, commands.errors.MissingRequiredArgument):
-        return await ctx.send('Invalid usage. Use $help <command> for more info.')
+        return await ctx.send(f'Invalid usage. Use \'$help {ctx.command}\' for more info.')
 
 # basic currency converter
 @bot.command(name='cc',
@@ -90,10 +90,12 @@ async def cc(ctx, amt:float, orig_c, new_c):
         value = round(amt * ratios_dict['usd_to_eur'], 2)
         response = f'${amt} equals {value}€'
         await ctx.send(response)
-    if orig_c == 'eur' and new_c == 'usd':
+    elif orig_c == 'eur' and new_c == 'usd':
         value = round(amt * ratios_dict['eur_to_usd'], 2)
         response = f'{amt}€ equals ${value}'
         await ctx.send(response)
+    else:
+        await ctx.send('This currency is not supported at this time. Use \'$help cc\' for more info.')
 
 # bot say - Admin only
 @bot.command(name='say',
