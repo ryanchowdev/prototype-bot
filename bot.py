@@ -64,6 +64,16 @@ async def on_message(message):
 
     await bot.process_commands(message)
 
+# error reporting
+@bot.event
+async def on_command_error(ctx, error):
+    if isinstance(error, commands.errors.NoPrivateMessage):
+        return await ctx.send('Sorry, this command cannot be used in private messages.')
+    if isinstance(error, commands.errors.CheckFailure):
+        return await ctx.send('You do not have the required role to use this command.')
+    if isinstance(error, commands.errors.MissingRequiredArgument):
+        return await ctx.send('Invalid usage. Use $help <command> for more info.')
+
 # basic currency converter
 @bot.command(name='cc',
     brief='Converts amount from orig to new currency. Use $help cc for more info.',
