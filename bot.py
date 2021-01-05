@@ -6,6 +6,7 @@ import random
 import discord
 from discord.ext import commands
 from dotenv import load_dotenv
+from forex_python.converter import CurrencyRates
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -14,6 +15,8 @@ GUILD = os.getenv('DISCORD_GUILD')
 intents = discord.Intents.default()
 intents.members = True
 intents.presences = True
+
+cr = CurrencyRates()
 
 bot = commands.Bot(intents=intents, command_prefix='$')
 
@@ -77,25 +80,14 @@ async def on_command_error(ctx, error):
 # basic currency converter
 @bot.command(name='cc',
     brief='Converts amount from orig to new currency. Use $help cc for more info.',
-    description=('Usage: $cc <amount> <orig_currency> <new_currency>'
-        '\nThis bot currently supports the following currencies:'
-        '\n\'usd\', \'eur\''
-        '\nExample: $cc 50 usd eur'
-    )
+    description=('Usage: $cc <amount> <orig_currency> <new_currency>')
 )
 async def cc(ctx, amt:float, orig_c, new_c):
-    ratios_dict = {'usd_to_eur': 0.84, 'eur_to_usd': 1.18}
-
-    if orig_c == 'usd' and new_c == 'eur':
-        value = round(amt * ratios_dict['usd_to_eur'], 2)
-        response = f'${amt} equals {value}€'
-        await ctx.send(response)
-    elif orig_c == 'eur' and new_c == 'usd':
-        value = round(amt * ratios_dict['eur_to_usd'], 2)
-        response = f'{amt}€ equals ${value}'
-        await ctx.send(response)
-    else:
-        await ctx.send('This currency is not supported at this time. Use \'$help cc\' for more info.')
+    upper_orig_c = orig_c.upper()
+    upper_new_c = new_c.upper()
+    value = cr.convert(upper_orig_c, upper_new_c, amt)
+    response = f'{amt:.2f} {upper_orig_c} = {value:.2f} {upper_new_c}'
+    await ctx.send(response)
 
 # bot say - Admin only
 @bot.command(name='say',
