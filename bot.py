@@ -4,11 +4,15 @@
 import os
 import random
 import discord
+import datetime
+import matplotlib.pyplot as plt
+import yfinance as yf
 from discord.ext import commands
 from dotenv import load_dotenv
 from forex_python.converter import CurrencyRates
 from forex_python.bitcoin import BtcConverter
 from pyowm import OWM
+from yahoo_fin import stock_info as si
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -144,6 +148,31 @@ async def weather(ctx, *args):
             f'**Sunrise**: {sunrise} UTC\n'
             f'**Sunset**: {sunset} UTC')
     await ctx.send(response)
+
+# obtain stocks data from Yahoo finance
+@bot.command(name='stocks',
+    brief='Get stocks data from Yahoo Finance.',
+    description='Usage: $stocks <symbol> <optional: period>\n'
+        'Default period is 1mo. Some examples of valid periods: 5d, 1wk, 1mo, 3mo, 1y, 5y')
+async def stocks(ctx, symbol, period='1mo'):
+    price = si.get_live_price(symbol)
+    ticker = yf.Ticker(symbol.upper())
+    ticker_df = ticker.history(period=period)
+
+    ticker_df['Close'].plot()
+    plt.xlabel('Date')
+    plt.ylabel('Price (USD)')
+    plt.title(f'{symbol.upper()} Price Data')
+    plt.savefig('stocks.png')
+    plt.clf()
+
+    title = f'Current price for {symbol.upper()}: ${price:.2f}'
+    file = discord.File('stocks.png', filename='stocks.png')
+    embed = discord.Embed()
+    embed.title = title
+    embed.colour = 0x00FF00 # green
+    embed.set_image(url='attachment://stocks.png')
+    await ctx.send(file=file, embed=embed)
 
 # bot say - Admin only
 @bot.command(name='say',
