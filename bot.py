@@ -7,6 +7,7 @@ import discord
 from discord.ext import commands
 from dotenv import load_dotenv
 from forex_python.converter import CurrencyRates
+from forex_python.bitcoin import BtcConverter
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -17,6 +18,7 @@ intents.members = True
 intents.presences = True
 
 cr = CurrencyRates()
+bc = BtcConverter()
 
 bot = commands.Bot(intents=intents, command_prefix='$')
 
@@ -77,7 +79,7 @@ async def on_command_error(ctx, error):
     if isinstance(error, commands.errors.MissingRequiredArgument):
         return await ctx.send(f'Invalid usage. Use \'$help {ctx.command}\' for more info.')
 
-# basic currency converter
+# currency converter using forex-python
 @bot.command(name='cc',
     brief='Converts amount from orig to new currency. Use $help cc for more info.',
     description=('Usage: $cc <amount> <orig_currency> <new_currency>')
@@ -87,6 +89,28 @@ async def cc(ctx, amt:float, orig_c, new_c):
     upper_new_c = new_c.upper()
     value = cr.convert(upper_orig_c, upper_new_c, amt)
     response = f'{amt:.2f} {upper_orig_c} = {value:.2f} {upper_new_c}'
+    await ctx.send(response)
+
+# convert bitcoin to currency using forex-python
+@bot.command(name='frombtc',
+    brief='Converts amount in BTC to desired currency. Use $help frombtc for more info.',
+    description=('Usage: $frombtc <amount> <currency>')
+)
+async def frombtc(ctx, amt:float, curr):
+    upper_curr = curr.upper()
+    value = bc.convert_btc_to_cur(amt, upper_curr)
+    response = f'{amt} BTC = {value:.2f} {upper_curr}'
+    await ctx.send(response)
+
+# convert currency to bitcoin using forex-python
+@bot.command(name='tobtc',
+    brief='Converts amount in desired currency to BTC. Use $help tobtc for more info.',
+    description=('Usage: $tobtc <amount> <currency>')
+)
+async def tobtc(ctx, amt:float, curr):
+    upper_curr = curr.upper()
+    value = bc.convert_to_btc(amt, upper_curr)
+    response = f'{amt:.2f} {upper_curr} = {value} BTC'
     await ctx.send(response)
 
 # bot say - Admin only
