@@ -135,14 +135,14 @@ async def weather(ctx, *args):
     sunset = w.sunset_time(timeformat='date')
 
     response = (f'Weather data for {location.capitalize()}.\n'
-            f'Status: {status}\n'
-            f'Temperature: {temp["temp"]:.2f}F / {((temp["temp"] - 32) / 1.8):.2f}C\n'
-            f'High: {temp["temp_max"]:.2f}F / {((temp["temp_max"] - 32) / 1.8):.2f}C\n'
-            f'Low: {temp["temp_min"]:.2f}F / {((temp["temp_min"] - 32) / 1.8):.2f}C\n'
-            f'Feels like: {temp["feels_like"]:.2f}F / {((temp["feels_like"] - 32) / 1.8):.2f}C\n'
-            f'Humidity: {humidity}%\n'
-            f'Sunrise: {sunrise} UTC\n'
-            f'Sunset: {sunset} UTC')
+            f'**Status**: {status}\n'
+            f'**Temperature**: {temp["temp"]:.2f}F / {((temp["temp"] - 32) / 1.8):.2f}C\n'
+            f'**High**: {temp["temp_max"]:.2f}F / {((temp["temp_max"] - 32) / 1.8):.2f}C\n'
+            f'**Low**: {temp["temp_min"]:.2f}F / {((temp["temp_min"] - 32) / 1.8):.2f}C\n'
+            f'**Feels like**: {temp["feels_like"]:.2f}F / {((temp["feels_like"] - 32) / 1.8):.2f}C\n'
+            f'**Humidity**: {humidity}%\n'
+            f'**Sunrise**: {sunrise} UTC\n'
+            f'**Sunset**: {sunset} UTC')
     await ctx.send(response)
 
 # bot say - Admin only
