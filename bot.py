@@ -8,10 +8,12 @@ from discord.ext import commands
 from dotenv import load_dotenv
 from forex_python.converter import CurrencyRates
 from forex_python.bitcoin import BtcConverter
+from pyowm import OWM
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 GUILD = os.getenv('DISCORD_GUILD')
+WEATHER = os.getenv('WEATHER_TOKEN')
 
 intents = discord.Intents.default()
 intents.members = True
@@ -19,6 +21,9 @@ intents.presences = True
 
 cr = CurrencyRates()
 bc = BtcConverter()
+
+owm = OWM(WEATHER)
+mgr = owm.weather_manager()
 
 bot = commands.Bot(intents=intents, command_prefix='$')
 
@@ -111,6 +116,22 @@ async def tobtc(ctx, amt:float, curr):
     upper_curr = curr.upper()
     value = bc.convert_to_btc(amt, upper_curr)
     response = f'{amt:.2f} {upper_curr} = {value} BTC'
+    await ctx.send(response)
+
+# obtain weather data with OpenWeatherMap and pyowm
+@bot.command(name='weather',
+    brief='Get weather data from OpenWeatherMap.',
+    description=('Usage: $weather <location>\n'
+        'You may include the country after the city name if you wish, separated by a comma. ex "$weather london,uk"')
+)
+async def weather(ctx, *args):
+    location = ' '.join(args)
+    observation = mgr.weather_at_place(location)
+    w = observation.weather
+    temp = w.temperature(unit='fahrenheit')
+
+    response = (f'The current temperature in {location.capitalize()} is {temp["temp"]:.2f}F / {((temp["temp"] - 32) / 1.8):.2f}C.\n'
+            f'It feels like {temp["feels_like"]:.2f}F / {((temp["feels_like"] - 32) / 1.8):.2f}C.')
     await ctx.send(response)
 
 # bot say - Admin only
