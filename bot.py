@@ -122,6 +122,9 @@ async def tobtc(ctx, amt:float, curr):
     response = f'{amt:.2f} {upper_curr} = {value} BTC'
     await ctx.send(response)
 
+def to_celsius(temp):
+    return (temp - 32) / 1.8
+
 # obtain weather data with OpenWeatherMap and pyowm
 @bot.command(name='weather',
     brief='Get weather data from OpenWeatherMap.',
@@ -129,7 +132,7 @@ async def tobtc(ctx, amt:float, curr):
         'You may include the country after the city name if you wish, separated by a comma. ex "$weather london,uk"')
 )
 async def weather(ctx, *args):
-    location = ' '.join(args)
+    location = ' '.join(a.capitalize() for a in args)
     observation = mgr.weather_at_place(location)
     w = observation.weather
     temp = w.temperature(unit='fahrenheit')
@@ -138,12 +141,12 @@ async def weather(ctx, *args):
     sunrise = w.sunrise_time(timeformat='date')
     sunset = w.sunset_time(timeformat='date')
 
-    response = (f'Weather data for {location.capitalize()}.\n'
+    response = (f'Weather data for {location}.\n'
             f'**Status**: {status}\n'
-            f'**Temperature**: {temp["temp"]:.2f}F / {((temp["temp"] - 32) / 1.8):.2f}C\n'
-            f'**High**: {temp["temp_max"]:.2f}F / {((temp["temp_max"] - 32) / 1.8):.2f}C\n'
-            f'**Low**: {temp["temp_min"]:.2f}F / {((temp["temp_min"] - 32) / 1.8):.2f}C\n'
-            f'**Feels like**: {temp["feels_like"]:.2f}F / {((temp["feels_like"] - 32) / 1.8):.2f}C\n'
+            f'**Temperature**: {temp["temp"]:.2f}F / {to_celsius(temp["temp"]):.2f}C\n'
+            f'**High**: {temp["temp_max"]:.2f}F / {to_celsius(temp["temp_max"]):.2f}C\n'
+            f'**Low**: {temp["temp_min"]:.2f}F / {to_celsius(temp["temp_min"]):.2f}C\n'
+            f'**Feels like**: {temp["feels_like"]:.2f}F / {to_celsius(temp["feels_like"]):.2f}C\n'
             f'**Humidity**: {humidity}%\n'
             f'**Sunrise**: {sunrise} UTC\n'
             f'**Sunset**: {sunset} UTC')
