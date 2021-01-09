@@ -135,21 +135,36 @@ async def weather(ctx, *args):
     location = ' '.join(a.capitalize() for a in args)
     observation = mgr.weather_at_place(location)
     w = observation.weather
-    temp = w.temperature(unit='fahrenheit')
-    humidity = w.humidity
+
     status = w.detailed_status
-    sunrise = w.sunrise_time(timeformat='date')
-    sunset = w.sunset_time(timeformat='date')
+
+    temp = w.temperature(unit='fahrenheit')
+    temp_f = temp['temp']
+    temp_c = to_celsius(temp['temp'])
+    high_f = temp['temp_max']
+    high_c = to_celsius(temp['temp_max'])
+    low_f = temp['temp_min']
+    low_c = to_celsius(temp['temp_min'])
+    feels_like_f = temp['feels_like']
+    feels_like_c = to_celsius(temp['feels_like'])
+
+    humidity = w.humidity
+
+    sunrise_utc = w.sunrise_time(timeformat='date')
+    sunset_utc = w.sunset_time(timeformat='date')
+    offset = w.utc_offset
+    sunrise = (sunrise_utc + datetime.timedelta(seconds=offset)).strftime("%Y-%m-%d %H:%M:%S")
+    sunset = (sunset_utc + datetime.timedelta(seconds=offset)).strftime("%Y-%m-%d %H:%M:%S")
 
     response = (f'Weather data for {location}.\n'
             f'**Status**: {status}\n'
-            f'**Temperature**: {temp["temp"]:.2f}F / {to_celsius(temp["temp"]):.2f}C\n'
-            f'**High**: {temp["temp_max"]:.2f}F / {to_celsius(temp["temp_max"]):.2f}C\n'
-            f'**Low**: {temp["temp_min"]:.2f}F / {to_celsius(temp["temp_min"]):.2f}C\n'
-            f'**Feels like**: {temp["feels_like"]:.2f}F / {to_celsius(temp["feels_like"]):.2f}C\n'
+            f'**Temperature**: {temp_f:.2f}F / {temp_c:.2f}C\n'
+            f'**High**: {high_f:.2f}F / {high_c:.2f}C\n'
+            f'**Low**: {low_f:.2f}F / {low_c:.2f}C\n'
+            f'**Feels like**: {feels_like_f:.2f}F / {feels_like_c:.2f}C\n'
             f'**Humidity**: {humidity}%\n'
-            f'**Sunrise**: {sunrise} UTC\n'
-            f'**Sunset**: {sunset} UTC')
+            f'**Sunrise**: {sunrise} (local time)\n'
+            f'**Sunset**: {sunset} (local time)\n')
     await ctx.send(response)
 
 # obtain stocks data from Yahoo finance
