@@ -132,7 +132,7 @@ def to_celsius(temp):
         'You may include the country after the city name if you wish, separated by a comma. ex "$weather london,uk"')
 )
 async def weather(ctx, *args):
-    location = ' '.join(a.capitalize() for a in args)
+    location = ' '.join(a.upper() for a in args)
     observation = mgr.weather_at_place(location)
     w = observation.weather
 
@@ -140,13 +140,13 @@ async def weather(ctx, *args):
 
     temp = w.temperature(unit='fahrenheit')
     temp_f = temp['temp']
-    temp_c = to_celsius(temp['temp'])
+    temp_c = to_celsius(temp_f)
     high_f = temp['temp_max']
-    high_c = to_celsius(temp['temp_max'])
+    high_c = to_celsius(high_f)
     low_f = temp['temp_min']
-    low_c = to_celsius(temp['temp_min'])
+    low_c = to_celsius(low_f)
     feels_like_f = temp['feels_like']
-    feels_like_c = to_celsius(temp['feels_like'])
+    feels_like_c = to_celsius(feels_like_f)
 
     humidity = w.humidity
 
@@ -192,7 +192,7 @@ async def stocks(ctx, symbol, period='1mo'):
     embed.set_image(url='attachment://stocks.png')
     await ctx.send(file=file, embed=embed)
 
-# bot say - Admin only
+# Make the bot say something - Admin only
 @bot.command(name='say',
     brief='Use the bot to say something. Admins only.')
 @commands.has_role('Admin')
@@ -203,7 +203,7 @@ async def say(ctx, *args):
     await ctx.message.delete()
     await ctx.send(message)
 
-# bot announcement - Admin only
+# Make an announcement - Admin only
 @bot.command(name='announce',
     brief='Use the bot to make an announcement. Admins only.')
 @commands.has_role('Admin')
@@ -214,5 +214,27 @@ async def announce(ctx, *args):
 
     await ctx.message.delete()
     await announcement_channel.send(message)
+
+# Change the bot's status - owner only
+@bot.command(name='status',
+    brief="Change the bot's status. Owner only.")
+@commands.is_owner()
+async def status(ctx, activity, *name):
+    act = activity.upper()
+    n = ' '.join(name)
+
+    if (act == 'PLAYING'):
+        response = f'Now playing {n}'
+        await bot.change_presence(activity=discord.Game(name=n))
+    elif (act == 'LISTENING'):
+        response = f'Now listening to {n}'
+        await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=n))
+    elif (act == 'WATCHING'):
+        response = f'Now watching {n}'
+        await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=n))
+    else:
+        pass
+
+    await ctx.send(response)
 
 bot.run(TOKEN)
