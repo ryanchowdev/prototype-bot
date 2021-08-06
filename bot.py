@@ -192,10 +192,40 @@ async def stocks(ctx, symbol, period='1mo'):
     embed.set_image(url='attachment://stocks.png')
     await ctx.send(file=file, embed=embed)
 
+# Kick - Admin only
+@bot.command(name='kick',
+    brief='Kick a user. Admins only.')
+@commands.has_permissions(administrator=True)
+async def kick(ctx, member: discord.Member, *, reason=None):
+    await member.kick(reason=reason)
+    await ctx.send(f'{member} was kicked for reason: {reason}')
+
+# Ban - Admin only
+@bot.command(name='ban',
+    brief='Ban a user. Admins only.')
+@commands.has_permissions(administrator=True)
+async def ban(ctx, member: discord.Member, *, reason=None):
+    await member.ban(reason=reason)
+    await ctx.send(f'{member} was banned for reason: {reason}')
+
+# Unban - Admin only
+@bot.command(name='unban',
+    brief='Unban a user. Admins only.')
+@commands.has_permissions(administrator=True)
+async def unban(ctx, member, *, reason=None):
+    ban_list = await ctx.guild.bans()
+    name, tag = member.split('#')
+
+    for b in ban_list:
+        user = b.user
+        if (user.name, user.discriminator) == (name, tag):
+            await ctx.guild.unban(user, reason=reason)
+            await ctx.send(f'{user} was unbanned for reason: {reason}')
+
 # Make the bot say something - Admin only
 @bot.command(name='say',
     brief='Use the bot to say something. Admins only.')
-@commands.has_role('Admin')
+@commands.has_permissions(administrator=True)
 async def say(ctx, *args):
     guild = ctx.guild
     message = ' '.join(args)
@@ -206,7 +236,7 @@ async def say(ctx, *args):
 # Make an announcement - Admin only
 @bot.command(name='announce',
     brief='Use the bot to make an announcement. Admins only.')
-@commands.has_role('Admin')
+@commands.has_permissions(administrator=True)
 async def announce(ctx, *args):
     guild = ctx.guild
     message = ' '.join(args)
