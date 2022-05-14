@@ -11,7 +11,7 @@ sudo apt install python3 python3-pip
 
 You must then install the following packages:  
 ```bash
-pip3 install discord matplotlib yfinance python-dotenv forex_python pyowm yahoo_fin requests_html
+pip3 install discord.py matplotlib yfinance python-dotenv forex_python pyowm yahoo_fin requests_html
 ```
 
 To configure the bot, first create a .env file to store your tokens.  
