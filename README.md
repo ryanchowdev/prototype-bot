@@ -1,6 +1,5 @@
 # Jeff-IX
 A multi-purpose Discord bot written in Python 3.  
-Note: This project is currently a work-in-progress.  
   
 ## Running this bot locally
 First, make sure you have python3 and python3-pip installed.  
