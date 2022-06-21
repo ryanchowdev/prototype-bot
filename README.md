@@ -1,4 +1,4 @@
-# Jeff-IX
+# prototype-bot
 A multi-purpose Discord bot written in Python 3.  
   
 ## Running this bot locally
